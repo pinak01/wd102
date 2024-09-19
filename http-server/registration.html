@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .wrapper {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        label {
+            flex: 1;
+            margin-right: 10px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"] {
+            flex: 2;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .terms-checkbox input {
+            margin-right: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <h2>Registration Form</h2>
+        <form id="userForm">
+            <div class="input-group">
+                <label for="fullName">Name:</label>
+                <input type="text" id="fullName" required>
+            </div>
+            <div class="input-group">
+                <label for="userEmail">Email:</label>
+                <input type="email" id="userEmail" required>
+            </div>
+            <div class="input-group">
+                <label for="userPassword">Password:</label>
+                <input type="password" id="userPassword" required>
+            </div>
+            <div class="input-group">
+                <label for="birthDate">Date of Birth:</label>
+                <input type="date" id="birthDate" required>
+            </div>
+            <div class="terms-checkbox">
+                <input type="checkbox" id="agreeTerms" required>
+                <label for="agreeTerms">Accept Terms & Conditions</label>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <h3>Entries</h3>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Dob</th>
+                    <th>Accepted terms?</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('userForm');
+        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+
+        loadStoredData();
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const dob = document.getElementById('birthDate').value;
+            const terms = document.getElementById('agreeTerms').checked;
+
+            const dateOfBirth = new Date(dob);
+            const calculatedAge = getAge(dateOfBirth);
+            if (calculatedAge < 18 || calculatedAge > 55) {
+                alert('Age must be between 18 and 55 years.');
+                return;
+            }
+
+            const row = tableBody.insertRow();
+            row.innerHTML = `<td>${fullName}</td><td>${email}</td><td>${password}</td><td>${dob}</td><td>${terms}</td>`;
+
+            saveToStorage({ fullName, email, password, dob, terms });
+
+            form.reset();
+        });
+    });
+
+    function getAge(birthDate) {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    }
+
+    function saveToStorage(data) {
+        let entries = JSON.parse(localStorage.getItem('registrations')) || [];
+        entries.push(data);
+        localStorage.setItem('registrations', JSON.stringify(entries));
+    }
+
+    function loadStoredData() {
+        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        const entries = JSON.parse(localStorage.getItem('registrations')) || [];
+        entries.forEach(entry => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `<td>${entry.fullName}</td><td>${entry.email}</td><td>${entry.password}</td><td>${entry.dob}</td><td>${entry.terms}</td>`;
+        });
+    }
+    </script>
+</body>
+</html>
