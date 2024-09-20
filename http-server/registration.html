@@ -154,6 +154,12 @@
         });
     });
 
+    function add(data) {
+            let Data = JSON.parse(localStorage.getItem('formData')) || [];
+            Data.push(data);
+            localStorage.setItem('formData', JSON.stringify(Data));
+        }
+
     function getAge(birthDate) {
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
